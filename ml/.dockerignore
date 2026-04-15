@@ -1,0 +1,42 @@
+# GoliTransit ML Module — .dockerignore
+# Exclude files not needed in the Docker image
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Large data files (mounted as volumes instead)
+data/*.csv
+data/*.parquet
+
+# Trained models (mounted as volumes instead)
+models/*.pkl
+models/*.h5
+models/*.joblib
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Misc
+*.log
+.env

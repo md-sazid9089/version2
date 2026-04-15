@@ -1,0 +1,159 @@
+# ============================================================
+# GoliTransit -- Docker Compose (Audited)
+# ============================================================
+# Orchestrates all services: backend, ml, frontend, redis
+#
+# Usage:
+#   docker compose up              -- Start all services (dev mode)
+#   docker compose up --build      -- Rebuild images and start
+#   docker compose up -d           -- Start detached
+#   docker compose logs -f backend -- Follow backend logs
+#   docker compose down            -- Stop and remove containers
+# ============================================================
+
+networks:
+  golitransit-net:
+    driver: bridge
+    name: golitransit-net
+
+volumes:
+  ml-models:
+    driver: local
+  ml-data:
+    driver: local
+  osm-cache:
+    driver: local
+  mysql-db:
+    driver: local
+  redis-data:
+    driver: local
+
+services:
+  # --- MySQL Database ---
+  mysql:
+    image: mysql:8.0
+    container_name: golitransit-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-golitransit}
+      MYSQL_USER: ${DB_USER:-golitransit}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-golitransit_pass}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-db:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - golitransit-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # --- Redis (in-memory cache for routing results) ---
+  redis:
+    image: redis:7-alpine
+    container_name: golitransit-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - golitransit-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+  # --- FastAPI Backend ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: golitransit-backend
+    restart: unless-stopped
+    env_file:
+      - ./production.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - ./backend:/app
+      - osm-cache:/app/data/osm_cache
+    environment:
+      - CONFIG_PATH=/app/config.json
+      - ML_PREDICTION_URL=http://ml:8001/predict
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=${DATABASE_URL:-mysql+pymysql://${DB_USER:-golitransit}:${DB_PASSWORD:-golitransit_pass}@${DOCKER_DB_HOST:-mysql}:${DB_PORT:-3306}/${DB_NAME:-golitransit}}
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      ml:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - golitransit-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 120s
+      retries: 3
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  # --- ML Prediction Service ---
+  ml:
+    build:
+      context: ./ml
+      dockerfile: Dockerfile
+    container_name: golitransit-ml
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - ./ml:/app
+      - ml-models:/app/models
+      - ml-data:/app/data
+    environment:
+      - CONFIG_PATH=/app/config.json
+      - PYTHONUNBUFFERED=1
+    networks:
+      - golitransit-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    command: python predict.py
+
+  # --- React Frontend (Vite dev server) ---
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: golitransit-frontend
+    restart: unless-stopped
+    ports:
+      - "5174:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_BASE_URL=http://backend:8000
+      - VITE_PROXY_TARGET=http://backend:8000
+      - VITE_HMR_CLIENT_PORT=5174
+      - DOCKER=true
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - golitransit-net
+    command: npm run dev -- --host 0.0.0.0

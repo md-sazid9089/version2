@@ -1,0 +1,57 @@
+services:
+  - type: web
+    name: golitransit-backend
+    env: python
+    region: oregon # Change as needed
+    plan: standard
+    
+    # Build configuration
+    buildCommand: cd backend && bash render-build.sh
+    startCommand: cd backend && bash render-start.sh
+    
+    # Environment variables (set these in Render dashboard for sensitive values)
+    envVars:
+      - key: PORT
+        value: 8000  # Will be overridden by Render's $PORT if needed
+      - key: PYTHONUNBUFFERED
+        value: 1
+      - key: RENDER
+        value: true
+      # Database - set these in Render dashboard
+      # - key: DATABASE_URL
+      #   fromDatabase:
+      #     name: golitransit-mysql
+      #     property: connectionString
+      # - key: JWT_SECRET_KEY
+      #   sync: false  # Sensitive, set in dashboard
+      # - key: ML_PREDICTION_URL
+      #   value: https://your-ml-service.onrender.com/predict
+    
+    # Health check
+    healthCheckPath: /health
+    healthCheckTimeout: 30  # Allow more time for startup
+    
+    # Auto-restart on failure
+    autoDeploy: true
+    
+    # Autoscale (optional - disable for hackathon to save costs)
+    autoscaling:
+      enabled: false
+      minInstances: 1
+      maxInstances: 3
+      targetMemoryPercent: 75
+    
+    # Disk requirements (for caching OSM graph data)
+    disk:
+      name: osm-cache
+      mountPath: /app/backend/cache
+      sizeGB: 5
+
+databases:
+  - name: golitransit-mysql
+    databaseName: golitransit
+    user: golitransit
+    region: oregon # Match service region
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: Allow all (restrict in production)

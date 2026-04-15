@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+
+# ML artifacts
+ml/models/*.pkl
+ml/models/*.h5
+ml/models/*.joblib
+ml/data/*.csv
+ml/data/*.parquet
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+*.log
+
+# OSM cache
+data/osm_cache/

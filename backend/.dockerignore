@@ -1,0 +1,40 @@
+# GoliTransit Backend — .dockerignore
+# Exclude files not needed in the Docker image
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Tests (removed in Dockerfile, but also exclude from build context)
+tests/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Misc
+*.log
+.env
+.env.local

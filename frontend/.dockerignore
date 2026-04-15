@@ -1,0 +1,31 @@
+# GoliTransit Frontend — .dockerignore
+# Exclude files not needed in the Docker image
+
+# Dependencies (installed inside container)
+node_modules/
+
+# Build output
+dist/
+.cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Misc
+*.log
+.env
+.env.local
