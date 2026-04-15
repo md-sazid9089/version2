@@ -6,7 +6,7 @@
     "default_location": "Ahsanullah University of Science and Technology, Dhaka, Bangladesh",
     "center_lat": 23.7639,
     "center_lng": 90.4066,
-    "radius_m": 2000,
+    "radius_m": 2500,
     "network_type": "all",
     "simplify": true,
     "cache_dir": "./data/osm_cache"
@@ -31,15 +31,22 @@
         "cycleway",
         "residential",
         "tertiary",
+        "tertiary_link",
         "secondary",
+        "secondary_link",
         "primary",
+        "primary_link",
         "trunk",
+        "trunk_link",
         "unclassified",
         "service",
         "living_street",
         "path",
+        "track",
+        "bridleway",
         "footway",
-        "pedestrian"
+        "pedestrian",
+        "road"
       ],
       "fuel_cost_per_km": 0.0,
       "co2_grams_per_km": 0
@@ -59,7 +66,10 @@
         "service",
         "unclassified",
         "living_street",
-        "path"
+        "path",
+        "track",
+        "road",
+        "alley"
       ],
       "fuel_cost_per_km": 0.03,
       "co2_grams_per_km": 0
@@ -69,10 +79,17 @@
       "allowed_road_types": [
         "footway",
         "path",
-        "residential",
-        "pedestrian",
+        "track",
+        "bridleway",
         "steps",
+        "crossing",
+        "pedestrian",
+        "living_street",
+        "residential",
         "service",
+        "alley",
+        "road",
+        "unclassified",
         "tertiary",
         "tertiary_link",
         "secondary",
@@ -80,9 +97,7 @@
         "primary",
         "primary_link",
         "trunk",
-        "trunk_link",
-        "living_street",
-        "unclassified"
+        "trunk_link"
       ],
       "fuel_cost_per_km": 0.0,
       "co2_grams_per_km": 0
