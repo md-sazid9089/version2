@@ -78,8 +78,8 @@ class Settings:
     )
 
     # Database
-    db_type: str = os.getenv("DB_TYPE", _raw.get("database", {}).get("type", "mysql"))
-    db_driver: str = os.getenv("DB_DRIVER", _raw.get("database", {}).get("driver", "mysql+pymysql"))
+    db_type: str = os.getenv("DB_TYPE", _raw.get("database", {}).get("type", "mssql"))
+    db_driver: str = os.getenv("DB_DRIVER", _raw.get("database", {}).get("driver", "mssql+pyodbc"))
     db_user: str = os.getenv("DB_USER", _raw.get("database", {}).get("user", "golitransit"))
     db_password: str = os.getenv("DB_PASSWORD", _raw.get("database", {}).get("password", "golitransit_pass"))
     db_host: str = os.getenv("DB_HOST", _raw.get("database", {}).get("host", "localhost"))

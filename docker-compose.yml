@@ -23,34 +23,12 @@ volumes:
     driver: local
   osm-cache:
     driver: local
-  mysql-db:
-    driver: local
   redis-data:
     driver: local
 
 services:
-  # --- MySQL Database ---
-  mysql:
-    image: mysql:8.0
-    container_name: golitransit-mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
-      MYSQL_DATABASE: ${DB_NAME:-golitransit}
-      MYSQL_USER: ${DB_USER:-golitransit}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-golitransit_pass}
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql-db:/var/lib/mysql
-    command: --default-authentication-plugin=mysql_native_password
-    networks:
-      - golitransit-net
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+  # NOTE: MySQL removed — database is Azure SQL (external managed service).
+  # Connection is configured via DATABASE_URL environment variable.
 
   # --- Redis (in-memory cache for routing results) ---
   redis:
@@ -89,7 +67,8 @@ services:
       - CONFIG_PATH=/app/config.json
       - ML_PREDICTION_URL=http://ml:8001/predict
       - REDIS_URL=redis://redis:6379/0
-      - DATABASE_URL=${DATABASE_URL:-mysql+pymysql://${DB_USER:-golitransit}:${DB_PASSWORD:-golitransit_pass}@${DOCKER_DB_HOST:-mysql}:${DB_PORT:-3306}/${DB_NAME:-golitransit}}
+      # Azure SQL — set DATABASE_URL in your .env or environment
+      - DATABASE_URL=${DATABASE_URL}
       - PYTHONUNBUFFERED=1
     depends_on:
       ml:

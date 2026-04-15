@@ -120,7 +120,7 @@ REQUIRED_PACKAGES=(
     "pydantic"
     "networkx"
     "sqlalchemy"
-    "pymysql"
+    "pyodbc"
 )
 
 for package in "${REQUIRED_PACKAGES[@]}"; do

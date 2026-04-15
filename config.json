@@ -102,12 +102,15 @@
   },
 
   "database": {
-    "driver": "mysql+pymysql",
-    "user": "golitransit",
-    "password": "golitransit_pass",
-    "host": "mysql",
-    "port": 3306,
-    "database": "golitransit"
+    "type": "mssql",
+    "driver": "mssql+pyodbc",
+    "host": "",
+    "port": 1433,
+    "user": "",
+    "password": "",
+    "database": "hackathon",
+    "ssl_mode": "disable",
+    "_note": "Set DATABASE_URL env var. Format: mssql+pyodbc://USER:PASS@HOST/DB?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes"
   },
 
   "jwt": {

@@ -59,20 +59,5 @@ services:
     volumes: []  # No bind mounts in production
     command: []  # Use Nginx default CMD from Dockerfile
 
-  # ─── MySQL Database (production overrides) ─────────────────
-  mysql:
-    ports:
-      - "3306:3306"
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-          cpus: "1.0"
-        reservations:
-          memory: 512M
-          cpus: "0.5"
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-          cpus: "0.5"
+  # NOTE: MySQL removed — database is Azure SQL (external managed service).
+  # No local DB container override needed in production.

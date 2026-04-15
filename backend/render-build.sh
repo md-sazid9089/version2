@@ -5,10 +5,11 @@ set -o errexit
 # ============================================
 # This script:
 #   1. Verifies we're in the correct backend directory
-#   2. Checks system dependencies (Python, pip, git)
-#   3. Installs Python dependencies from requirements.txt
-#   4. Sets up configuration
-#   5. Verifies critical imports
+#   2. Installs Microsoft ODBC Driver 18 for SQL Server (required by pyodbc)
+#   3. Checks system dependencies (Python, pip, git)
+#   4. Installs Python dependencies from requirements.txt
+#   5. Sets up configuration
+#   6. Verifies critical imports
 
 echo "=========================================="
 echo "GoliTransit Backend Build Script"
@@ -60,7 +61,29 @@ else
     echo "[✓] Found git"
 fi
 
-# ─── Upgrade pip and setuptools ────────────────────────────────
+# ─── Install Microsoft ODBC Driver 18 for SQL Server ───────────
+# Required by pyodbc to connect to Azure SQL (MSSQL).
+# Uses the official Microsoft apt repository for Ubuntu (Render's OS).
+echo ""
+echo "[INFO] Installing Microsoft ODBC Driver 18 for SQL Server..."
+
+if ! command -v sqlcmd &> /dev/null && ! dpkg -l | grep -q msodbcsql18; then
+    # Add Microsoft signing key and repo
+    curl -sSL https://packages.microsoft.com/keys/microsoft.asc | apt-key add - 2>/dev/null || true
+    curl -sSL https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
+        -o /etc/apt/sources.list.d/mssql-release.list
+
+    apt-get update -qq
+    ACCEPT_EULA=Y apt-get install -y --no-install-recommends \
+        msodbcsql18 \
+        unixodbc-dev
+
+    rm -rf /var/lib/apt/lists/*
+    echo "[✓] ODBC Driver 18 installed successfully"
+else
+    echo "[✓] ODBC Driver 18 already present — skipping"
+fi
+
 echo ""
 echo "[INFO] Upgrading pip and setuptools..."
 pip3 install --upgrade pip setuptools wheel --quiet
@@ -91,7 +114,7 @@ required_modules = [
     'networkx',
     'osmnx',
     'sqlalchemy',
-    'pymysql',
+    'pyodbc',
     'httpx',
 ]
 

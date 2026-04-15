@@ -17,15 +17,16 @@ services:
         value: 1
       - key: RENDER
         value: true
-      # Database - set these in Render dashboard
-      # - key: DATABASE_URL
-      #   fromDatabase:
-      #     name: golitransit-mysql
-      #     property: connectionString
-      # - key: JWT_SECRET_KEY
-      #   sync: false  # Sensitive, set in dashboard
-      # - key: ML_PREDICTION_URL
-      #   value: https://your-ml-service.onrender.com/predict
+      # ── Azure SQL (MSSQL) — set in Render dashboard ────────────
+      # Paste your full connection string as the value:
+      # mssql+pyodbc://admin123:PASSWORD@versionlol.database.windows.net/hackathon
+      #   ?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no
+      - key: DATABASE_URL
+        sync: false  # Secret — set value in Render dashboard, not here
+      - key: JWT_SECRET_KEY
+        sync: false  # Secret — set value in Render dashboard
+      - key: ML_PREDICTION_URL
+        value: https://your-ml-service.onrender.com/predict
     
     # Health check
     healthCheckPath: /health
@@ -47,11 +48,7 @@ services:
       mountPath: /app/backend/cache
       sizeGB: 5
 
-databases:
-  - name: golitransit-mysql
-    databaseName: golitransit
-    user: golitransit
-    region: oregon # Match service region
-    ipAllowList:
-      - source: 0.0.0.0/0
-        description: Allow all (restrict in production)
+# databases: section removed.
+# Azure SQL (MSSQL) is used as the external managed database.
+# No Render-managed database is needed.
+# Configure DATABASE_URL in the Render dashboard under Environment Variables.
