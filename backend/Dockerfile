@@ -20,8 +20,8 @@ FROM python:3.11-slim AS builder
 
 WORKDIR /build
 
-# Install system deps needed by OSMnx/NetworkX (GDAL, spatial libs)
-# and Microsoft ODBC Driver 18 for SQL Server (required by pyodbc → Azure SQL)
+# Install system build deps + Microsoft ODBC Driver 18 for SQL Server
+# NOTE: apt-key is removed in Debian 12 (Bookworm) — use gpg --dearmor instead
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
@@ -29,10 +29,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libspatialindex-dev \
     curl \
     gnupg \
-    apt-transport-https \
-    && curl -sSL https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl -sSL https://packages.microsoft.com/config/debian/11/prod.list \
-        -o /etc/apt/sources.list.d/mssql-release.list \
+    && curl -sSL https://packages.microsoft.com/keys/microsoft.asc \
+        | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" \
+        > /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
     && ACCEPT_EULA=Y apt-get install -y --no-install-recommends \
         msodbcsql18 \
@@ -58,15 +58,16 @@ LABEL description="GoliTransit FastAPI Backend -- Multi-modal routing engine"
 WORKDIR /app
 
 # Install minimal runtime system deps + ODBC Driver 18 (required at runtime by pyodbc)
+# NOTE: apt-key is removed in Debian 12 (Bookworm) — use gpg --dearmor instead
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgdal-dev \
     libspatialindex-dev \
     curl \
     gnupg \
-    apt-transport-https \
-    && curl -sSL https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl -sSL https://packages.microsoft.com/config/debian/11/prod.list \
-        -o /etc/apt/sources.list.d/mssql-release.list \
+    && curl -sSL https://packages.microsoft.com/keys/microsoft.asc \
+        | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" \
+        > /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
     && ACCEPT_EULA=Y apt-get install -y --no-install-recommends \
         msodbcsql18 \

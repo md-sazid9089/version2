@@ -63,15 +63,22 @@ fi
 
 # ─── Install Microsoft ODBC Driver 18 for SQL Server ───────────
 # Required by pyodbc to connect to Azure SQL (MSSQL).
-# Uses the official Microsoft apt repository for Ubuntu (Render's OS).
+# Uses the official Microsoft apt repo for Ubuntu 22.04 (Render's OS).
+# NOTE: apt-key is deprecated — using gpg --dearmor instead.
 echo ""
 echo "[INFO] Installing Microsoft ODBC Driver 18 for SQL Server..."
 
-if ! command -v sqlcmd &> /dev/null && ! dpkg -l | grep -q msodbcsql18; then
-    # Add Microsoft signing key and repo
-    curl -sSL https://packages.microsoft.com/keys/microsoft.asc | apt-key add - 2>/dev/null || true
-    curl -sSL https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
-        -o /etc/apt/sources.list.d/mssql-release.list
+if ! dpkg -l | grep -q msodbcsql18; then
+    # Install curl and gpg if not present
+    apt-get install -y --no-install-recommends curl gnupg -qq 2>/dev/null || true
+
+    # Add Microsoft GPG key using modern method (no apt-key)
+    curl -sSL https://packages.microsoft.com/keys/microsoft.asc \
+        | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
+
+    # Add Microsoft Ubuntu 22.04 repo
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/ubuntu/22.04/prod jammy main" \
+        > /etc/apt/sources.list.d/mssql-release.list
 
     apt-get update -qq
     ACCEPT_EULA=Y apt-get install -y --no-install-recommends \
