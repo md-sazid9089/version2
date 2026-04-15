@@ -21,9 +21,13 @@ python-dotenv==1.0.1
 orjson==3.9.15
 scikit-learn==1.5.2
 
-# Database (SQLite is built into Python — no driver needed)
-# TODO: Add pymysql==1.1.0 and cryptography==46.0.7 when switching back to MySQL
+# Database — Azure SQL / MSSQL
+# NOTE: pyodbc requires "ODBC Driver 18 for SQL Server" installed on the host:
+#   Local Windows : https://aka.ms/downloadmsodbcsql
+#   Render/Ubuntu : see render-build.sh (apt-get install msodbcsql18)
+#   Docker        : see Dockerfile (microsoft/mssql-tools)
 SQLAlchemy==2.0.29
+pyodbc==5.1.0
 bcrypt==4.1.2
 PyJWT==2.12.1
 

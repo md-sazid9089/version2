@@ -78,14 +78,15 @@ class Settings:
     )
 
     # Database
-    # TODO: To switch back to MySQL, set DATABASE_URL env var:
-    #   DATABASE_URL=mysql+pymysql://user:pass@host:3306/dbname
-    db_type: str = os.getenv("DB_TYPE", _raw.get("database", {}).get("type", "sqlite"))
+    db_type: str = os.getenv("DB_TYPE", _raw.get("database", {}).get("type", "mysql"))
+    db_driver: str = os.getenv("DB_DRIVER", _raw.get("database", {}).get("driver", "mysql+pymysql"))
+    db_user: str = os.getenv("DB_USER", _raw.get("database", {}).get("user", "golitransit"))
+    db_password: str = os.getenv("DB_PASSWORD", _raw.get("database", {}).get("password", "golitransit_pass"))
+    db_host: str = os.getenv("DB_HOST", _raw.get("database", {}).get("host", "localhost"))
+    db_port: int = int(os.getenv("DB_PORT", _raw.get("database", {}).get("port", 3306)))
+    db_name: str = os.getenv("DB_NAME", _raw.get("database", {}).get("database", "golitransit"))
     db_ssl_mode: str = os.getenv("DB_SSL_MODE", _raw.get("database", {}).get("ssl_mode", "disable"))
-    database_url: Optional[str] = os.getenv(
-        "DATABASE_URL",
-        _raw.get("database", {}).get("url", "sqlite:///./golitransit.db")
-    )
+    database_url: Optional[str] = os.getenv("DATABASE_URL")
 
     # JWT
     jwt_secret_key: str = os.getenv("JWT_SECRET_KEY", _raw.get("jwt", {}).get("secret_key", "your-secret-key-change-in-production"))

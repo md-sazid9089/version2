@@ -1,7 +1,6 @@
 {
   "project_name": "GoliTransit",
   "version": "0.1.0",
-
   "graph": {
     "osm_source": "osmnx",
     "default_location": "Ahsanullah University of Science and Technology, Dhaka, Bangladesh",
@@ -12,60 +11,160 @@
     "simplify": true,
     "cache_dir": "./data/osm_cache"
   },
-
   "vehicle_types": {
     "car": {
       "default_speed_kmh": 50,
-      "allowed_road_types": ["motorway", "trunk", "primary", "secondary", "tertiary", "residential"],
+      "allowed_road_types": [
+        "motorway",
+        "trunk",
+        "primary",
+        "secondary",
+        "tertiary",
+        "residential"
+      ],
       "fuel_cost_per_km": 0.12,
       "co2_grams_per_km": 120
     },
     "bike": {
       "default_speed_kmh": 15,
-      "allowed_road_types": ["cycleway", "residential", "tertiary", "secondary", "primary", "trunk", "unclassified", "service", "living_street", "path", "footway", "pedestrian"],
+      "allowed_road_types": [
+        "cycleway",
+        "residential",
+        "tertiary",
+        "secondary",
+        "primary",
+        "trunk",
+        "unclassified",
+        "service",
+        "living_street",
+        "path",
+        "footway",
+        "pedestrian"
+      ],
       "fuel_cost_per_km": 0.0,
       "co2_grams_per_km": 0
     },
     "rickshaw": {
       "default_speed_kmh": 15,
-      "allowed_road_types": ["trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link", "residential", "service", "unclassified", "living_street", "path"],
+      "allowed_road_types": [
+        "trunk",
+        "trunk_link",
+        "primary",
+        "primary_link",
+        "secondary",
+        "secondary_link",
+        "tertiary",
+        "tertiary_link",
+        "residential",
+        "service",
+        "unclassified",
+        "living_street",
+        "path"
+      ],
       "fuel_cost_per_km": 0.03,
       "co2_grams_per_km": 0
     },
     "walk": {
       "default_speed_kmh": 5,
-      "allowed_road_types": ["footway", "path", "residential", "pedestrian", "steps", "service", "tertiary", "tertiary_link", "secondary", "secondary_link", "primary", "primary_link", "trunk", "trunk_link", "living_street", "unclassified"],
+      "allowed_road_types": [
+        "footway",
+        "path",
+        "residential",
+        "pedestrian",
+        "steps",
+        "service",
+        "tertiary",
+        "tertiary_link",
+        "secondary",
+        "secondary_link",
+        "primary",
+        "primary_link",
+        "trunk",
+        "trunk_link",
+        "living_street",
+        "unclassified"
+      ],
       "fuel_cost_per_km": 0.0,
       "co2_grams_per_km": 0
     },
     "transit": {
       "default_speed_kmh": 30,
-      "allowed_road_types": ["primary", "secondary", "tertiary", "trunk"],
+      "allowed_road_types": [
+        "primary",
+        "secondary",
+        "tertiary",
+        "trunk"
+      ],
       "fuel_cost_per_km": 0.05,
       "co2_grams_per_km": 40
     }
   },
-
   "mode_switch_penalties": {
     "default_penalty_seconds": 5,
-    "car_to_walk": { "time_seconds": 120, "cost_units": 0.5 },
-    "car_to_rickshaw": { "time_seconds": 90, "cost_units": 0.3 },
-    "car_to_transit": { "time_seconds": 300, "cost_units": 1.0 },
-    "rickshaw_to_walk": { "time_seconds": 30, "cost_units": 0.1 },
-    "rickshaw_to_car": { "time_seconds": 90, "cost_units": 0.3 },
-    "walk_to_rickshaw": { "time_seconds": 30, "cost_units": 0.1 },
-    "walk_to_transit": { "time_seconds": 60, "cost_units": 0.2 },
-    "walk_to_car": { "time_seconds": 120, "cost_units": 0.5 },
-    "bike_to_transit": { "time_seconds": 180, "cost_units": 0.8 },
-    "transit_to_walk": { "time_seconds": 60, "cost_units": 0.2 },
-    "transit_to_car": { "time_seconds": 300, "cost_units": 1.0 },
-    "transit_to_rickshaw": { "time_seconds": 60, "cost_units": 0.2 },
-    "walk_to_bike": { "time_seconds": 90, "cost_units": 0.3 },
-    "bike_to_walk": { "time_seconds": 60, "cost_units": 0.1 }
+    "car_to_walk": {
+      "time_seconds": 120,
+      "cost_units": 0.5
+    },
+    "car_to_rickshaw": {
+      "time_seconds": 90,
+      "cost_units": 0.3
+    },
+    "car_to_transit": {
+      "time_seconds": 300,
+      "cost_units": 1.0
+    },
+    "rickshaw_to_walk": {
+      "time_seconds": 30,
+      "cost_units": 0.1
+    },
+    "rickshaw_to_car": {
+      "time_seconds": 90,
+      "cost_units": 0.3
+    },
+    "walk_to_rickshaw": {
+      "time_seconds": 30,
+      "cost_units": 0.1
+    },
+    "walk_to_transit": {
+      "time_seconds": 60,
+      "cost_units": 0.2
+    },
+    "walk_to_car": {
+      "time_seconds": 120,
+      "cost_units": 0.5
+    },
+    "bike_to_transit": {
+      "time_seconds": 180,
+      "cost_units": 0.8
+    },
+    "transit_to_walk": {
+      "time_seconds": 60,
+      "cost_units": 0.2
+    },
+    "transit_to_car": {
+      "time_seconds": 300,
+      "cost_units": 1.0
+    },
+    "transit_to_rickshaw": {
+      "time_seconds": 60,
+      "cost_units": 0.2
+    },
+    "walk_to_bike": {
+      "time_seconds": 90,
+      "cost_units": 0.3
+    },
+    "bike_to_walk": {
+      "time_seconds": 60,
+      "cost_units": 0.1
+    }
   },
-
   "anomaly": {
-    "severity_levels": ["low", "medium", "high", "critical"],
+    "severity_levels": [
+      "low",
+      "medium",
+      "high",
+      "critical"
+    ],
     "weight_multipliers": {
       "low": 1.2,
       "medium": 1.8,
@@ -75,16 +174,21 @@
     "auto_expire_minutes": 60,
     "reroute_on_severity": "medium"
   },
-
   "ml": {
     "model_type": "random_forest",
     "model_path": "./ml/models/edge_time_predictor.pkl",
     "prediction_server_url": "http://localhost:8001/predict",
-    "features": ["hour_of_day", "day_of_week", "road_type", "road_length_m", "speed_limit", "historical_avg_time"],
+    "features": [
+      "hour_of_day",
+      "day_of_week",
+      "road_type",
+      "road_length_m",
+      "speed_limit",
+      "historical_avg_time"
+    ],
     "retrain_interval_hours": 24,
     "fallback_to_default": true
   },
-
   "routing": {
     "algorithm": "dijkstra",
     "weight_attribute": "travel_time",
@@ -92,45 +196,63 @@
     "multimodal_max_transfers": 3,
     "transfer_radius_meters": 500
   },
-
   "server": {
     "backend_host": "0.0.0.0",
     "backend_port": 8000,
     "ml_server_port": 8001,
     "frontend_port": 5173,
-    "cors_origins": ["http://localhost:5173", "http://127.0.0.1:5173"]
+    "cors_origins": [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173"
+    ]
   },
-
   "database": {
-    "type": "sqlite",
-    "driver": "sqlite",
-    "url": "sqlite:///./golitransit.db"
+    "driver": "mysql+pymysql",
+    "user": "golitransit",
+    "password": "golitransit_pass",
+    "host": "mysql",
+    "port": 3306,
+    "database": "golitransit"
   },
-
   "jwt": {
     "secret_key": "your-secret-key-change-in-production",
     "algorithm": "HS256",
     "access_token_expire_minutes": 30
   },
-
   "demo_scenarios": {
     "scenario_1_rush_hour": {
       "description": "Simulate morning rush hour with heavy congestion on highways",
       "anomalies": [
-        { "edge_id": "highway_101_seg_5", "severity": "high", "type": "congestion" },
-        { "edge_id": "highway_101_seg_6", "severity": "medium", "type": "congestion" }
+        {
+          "edge_id": "highway_101_seg_5",
+          "severity": "high",
+          "type": "congestion"
+        },
+        {
+          "edge_id": "highway_101_seg_6",
+          "severity": "medium",
+          "type": "congestion"
+        }
       ]
     },
     "scenario_2_road_closure": {
       "description": "Major road closure forcing detour",
       "anomalies": [
-        { "edge_id": "market_st_seg_3", "severity": "critical", "type": "closure" }
+        {
+          "edge_id": "market_st_seg_3",
+          "severity": "critical",
+          "type": "closure"
+        }
       ]
     },
     "scenario_3_weather": {
       "description": "Rain reducing speeds across the network",
       "anomalies": [
-        { "edge_id": "*", "severity": "low", "type": "weather" }
+        {
+          "edge_id": "*",
+          "severity": "low",
+          "type": "weather"
+        }
       ]
     }
   }
