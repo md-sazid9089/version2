@@ -295,36 +295,7 @@ function RoutePanel({
           )}
 
           {routeResult.traffic_status === 'ready' && routeResult.traffic_jam_prediction && (
-            <div style={{
-              padding: '10px 14px',
-              background: 'rgba(59,130,246,0.08)',
-              border: '1px solid rgba(59,130,246,0.25)',
-              borderRadius: 10,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 6,
-            }}>
-              <div style={{
-                color: '#93c5fd',
-                fontWeight: 800,
-                fontSize: 12,
-                letterSpacing: '0.02em',
-                fontFamily: 'Inter, system-ui, sans-serif',
-              }}>
-                Traffic Jam Chance: {routeResult.traffic_jam_prediction.route_jam_chance_pct}%
-              </div>
-              <div style={{
-                color: '#a3a3a3',
-                fontSize: 10,
-                fontFamily: 'JetBrains Mono, monospace',
-              }}>
-                Time {formatHourOfDay(routeResult.traffic_jam_prediction.hour_of_day)} |
-                Edges {routeResult.traffic_jam_prediction.edges_analyzed} |
-                Heavy {routeResult.traffic_jam_prediction.heavy_edges} |
-                Moderate {routeResult.traffic_jam_prediction.moderate_edges} |
-                Low {routeResult.traffic_jam_prediction.low_edges}
-              </div>
-            </div>
+            <TrafficJamCard data={routeResult.traffic_jam_prediction} />
           )}
 
           {/* Real multimodal recommendation output */}
@@ -685,6 +656,153 @@ function MetricCell({ value, label, accent, borderRight }) {
       }}>
         {label}
       </div>
+    </div>
+  );
+}
+
+
+// --- Traffic Jam Card ---
+
+function getJamTheme(pct) {
+  if (pct >= 70) return {
+    bg:     'rgba(239,68,68,0.10)',
+    border: 'rgba(239,68,68,0.30)',
+    bar:    'linear-gradient(90deg,#ef4444,#dc2626)',
+    text:   '#f87171',
+    label:  'HIGH RISK',
+    icon:   '🔴',
+    glow:   'rgba(239,68,68,0.25)',
+  };
+  if (pct >= 40) return {
+    bg:     'rgba(245,158,11,0.10)',
+    border: 'rgba(245,158,11,0.30)',
+    bar:    'linear-gradient(90deg,#f59e0b,#d97706)',
+    text:   '#fbbf24',
+    label:  'MODERATE',
+    icon:   '🟡',
+    glow:   'rgba(245,158,11,0.20)',
+  };
+  return {
+    bg:     'rgba(34,197,94,0.08)',
+    border: 'rgba(34,197,94,0.25)',
+    bar:    'linear-gradient(90deg,#22c55e,#16a34a)',
+    text:   '#4ade80',
+    label:  'LOW RISK',
+    icon:   '🟢',
+    glow:   'rgba(34,197,94,0.15)',
+  };
+}
+
+function TrafficJamCard({ data }) {
+  const pct   = Number(data?.route_jam_chance_pct ?? 0);
+  const heavy = Number(data?.heavy_edges ?? 0);
+  const mod   = Number(data?.moderate_edges ?? 0);
+  const low   = Number(data?.low_edges ?? 0);
+  const total = Number(data?.edges_analyzed ?? 0);
+  const hour  = data?.hour_of_day;
+  const theme = getJamTheme(pct);
+
+  return (
+    <div className="traffic-jam-card animate-slide-up" style={{
+      padding: '12px 14px',
+      background: theme.bg,
+      border: `1px solid ${theme.border}`,
+      borderRadius: 14,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 9,
+      boxShadow: `0 4px 20px ${theme.glow}`,
+    }}>
+
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          <span style={{ fontSize: 16 }}>{theme.icon}</span>
+          <div>
+            <div style={{
+              fontSize: 11, fontWeight: 800, color: '#e5e7eb',
+              fontFamily: 'Inter, system-ui, sans-serif',
+              letterSpacing: '-0.01em',
+            }}>
+              Traffic Jam Risk
+            </div>
+            <div style={{
+              fontSize: 9, color: theme.text,
+              fontFamily: 'JetBrains Mono, monospace',
+              fontWeight: 700, letterSpacing: '0.10em',
+            }}>
+              {theme.label}
+            </div>
+          </div>
+        </div>
+        <span style={{
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: 28, fontWeight: 800,
+          color: theme.text,
+          lineHeight: 1,
+          letterSpacing: '-0.03em',
+        }}>
+          {pct}<span style={{ fontSize: 14, opacity: 0.7 }}>%</span>
+        </span>
+      </div>
+
+      {/* Progress bar */}
+      <div style={{
+        height: 6, background: 'rgba(255,255,255,0.07)',
+        borderRadius: 99, overflow: 'hidden',
+      }}>
+        <div style={{
+          height: '100%',
+          width: `${Math.min(pct, 100)}%`,
+          background: theme.bar,
+          borderRadius: 99,
+          transition: 'width 0.8s cubic-bezier(0.34,1.56,0.64,1)',
+          boxShadow: `0 0 8px ${theme.glow}`,
+        }} />
+      </div>
+
+      {/* Edge breakdown pills */}
+      <div style={{ display: 'flex', gap: 6 }}>
+        <EdgePill label="Heavy"    count={heavy} color="#ef4444" />
+        <EdgePill label="Moderate" count={mod}   color="#f59e0b" />
+        <EdgePill label="Clear"    count={low}   color="#22c55e" />
+      </div>
+
+      {/* Footer */}
+      <div style={{
+        fontSize: 9, color: '#525252',
+        fontFamily: 'JetBrains Mono, monospace',
+        display: 'flex', gap: 10,
+      }}>
+        {hour !== undefined && <span>⏰ {formatHourOfDay(hour)}</span>}
+        <span>📊 {total} segments</span>
+      </div>
+    </div>
+  );
+}
+
+function EdgePill({ label, count, color }) {
+  return (
+    <div style={{
+      flex: 1,
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      padding: '5px 4px',
+      background: `${color}14`,
+      border: `1px solid ${color}30`,
+      borderRadius: 8,
+      gap: 2,
+    }}>
+      <span style={{
+        fontFamily: 'JetBrains Mono, monospace',
+        fontSize: 14, fontWeight: 800, color,
+        lineHeight: 1,
+      }}>{count}</span>
+      <span style={{
+        fontSize: 8, color: '#737373',
+        fontWeight: 700, textTransform: 'uppercase',
+        letterSpacing: '0.08em',
+        fontFamily: 'JetBrains Mono, monospace',
+      }}>{label}</span>
     </div>
   );
 }

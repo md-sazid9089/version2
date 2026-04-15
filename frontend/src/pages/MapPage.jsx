@@ -756,6 +756,7 @@ function MapPage({ apiStatus, onGoBack }) {
       }}>
         {/* Always-visible launcher */}
         <button
+          className="anomaly-fab-btn"
           onClick={() => setIsAnomalyPanelCollapsed((v) => !v)}
           style={{
             width: isAnomalyPanelCollapsed ? 'auto' : '100%',

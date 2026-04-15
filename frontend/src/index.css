@@ -846,3 +846,47 @@ body {
     overflow-x: hidden;
   }
 }
+
+/* ─── Traffic Jam Card ───────────────────────────────────────── */
+
+/* Already fluid — just ensure the progress bar animates smoothly */
+.traffic-jam-card {
+  contain: layout;
+}
+
+/* ─── Anomaly FAB Button ─────────────────────────────────────── */
+
+/* Desktop: pill button in top-right corner — default inline style applies */
+
+/* Mobile: make it a prominent circular/pill FAB fixed to screen */
+@media (max-width: 640px) {
+  /* Reposition the entire anomaly controls container */
+  .hud-anomaly-controls {
+    position: fixed !important;
+    top: auto !important;
+    bottom: calc(54vh + 14px) !important; /* sit just above the bottom drawer */
+    right: 12px !important;
+    width: auto !important;
+    z-index: 70 !important;
+  }
+
+  /* Make the button itself a large FAB */
+  .anomaly-fab-btn {
+    width: auto !important;
+    margin-left: 0 !important;
+    padding: 12px 18px !important;
+    font-size: 14px !important;
+    border-radius: 999px !important;
+    box-shadow:
+      0 8px 24px rgba(0,0,0,0.60),
+      0 0 0 2px rgba(245,158,11,0.30),
+      0 0 16px rgba(245,158,11,0.25) !important;
+    /* Amber pulse on mobile so user notices it */
+    animation: anomalyPulse 3s ease-in-out infinite !important;
+  }
+}
+
+@keyframes anomalyPulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(0,0,0,0.60), 0 0 0 2px rgba(245,158,11,0.30), 0 0 10px rgba(245,158,11,0.20); }
+  50%       { box-shadow: 0 8px 24px rgba(0,0,0,0.60), 0 0 0 3px rgba(245,158,11,0.50), 0 0 24px rgba(245,158,11,0.40); }
+}
