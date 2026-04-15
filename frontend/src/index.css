@@ -750,3 +750,99 @@ body {
     top: 0;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE
+   All rules are additive — no desktop visuals change.
+   Uses !important to override inline React styles.
+═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Navbar Pill ─────────────────────────────────────────────── */
+
+/* Tablet: tighten pill padding */
+@media (max-width: 768px) {
+  .app-navbar-pill {
+    gap: 4px !important;
+    padding: 6px 8px !important;
+  }
+}
+
+/* Mobile: hide the tiny "Routing Engine v0.1" label to save width */
+@media (max-width: 560px) {
+  .navbar-engine-label {
+    display: none !important;
+  }
+  .app-navbar-pill {
+    gap: 4px !important;
+    padding: 5px 8px !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+}
+
+/* ─── MapPage HUD: Left Side Panel ───────────────────────────── */
+
+/* Tablet: slightly narrower */
+@media (max-width: 900px) {
+  .hud-left-panel {
+    width: 272px !important;
+  }
+}
+
+/* Mobile: Google-Maps-style bottom drawer */
+@media (max-width: 640px) {
+  .hud-left-panel {
+    /* Detach from sides and drop to bottom */
+    width: calc(100vw - 12px) !important;
+    left: 6px !important;
+    right: 6px !important;
+    top: auto !important;
+    bottom: 0 !important;
+
+    /* Drawer appearance */
+    max-height: 54vh !important;
+    border-radius: 20px 20px 0 0 !important;
+    padding-bottom: 12px !important;
+
+    /* Ensure it scrolls internally */
+    overflow-y: auto !important;
+  }
+
+  /* Anomaly controls: keep top-right, just ensure no overlap */
+  .hud-anomaly-controls {
+    top: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+  }
+}
+
+/* ─── HomePage: Pricing Featured Card ───────────────────────── */
+
+/* scale(1.05) causes horizontal overflow on single-column mobile layout */
+@media (max-width: 700px) {
+  .pricing-featured-card {
+    transform: none !important;
+  }
+}
+
+/* ─── HomePage: Section Padding ─────────────────────────────── */
+
+/* Ensure all sections have comfortable mobile padding */
+@media (max-width: 480px) {
+  /* System status panel inner padding */
+  .sys-status-inner {
+    padding: 20px 18px !important;
+  }
+
+  /* Metrics value slightly smaller on tiny phones */
+  .metric-value {
+    font-size: 36px !important;
+  }
+}
+
+/* ─── Global: prevent horizontal scroll ──────────────────────── */
+
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+}

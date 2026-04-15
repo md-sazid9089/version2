@@ -382,7 +382,7 @@ function HomePage({ onNavigateToMap, apiStatus }) {
             </div>
 
             {/* Professional Plan (most popular) */}
-            <div style={{
+            <div className="pricing-featured-card" style={{
               background: 'linear-gradient(135deg, #14b8a6, #38bdf8)',
               padding: '2px',
               borderRadius: 24,

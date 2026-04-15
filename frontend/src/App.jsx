@@ -54,7 +54,7 @@ function App() {
         justifyContent: 'center',
         pointerEvents: 'none',           /* let clicks pass through padding area */
       }}>
-        <div style={{
+        <div className="app-navbar-pill" style={{
           display: 'flex', alignItems: 'center', gap: 6,
           background: isMapPage
             ? 'rgba(22,22,24,0.88)'
@@ -65,7 +65,7 @@ function App() {
           borderRadius: 999,
           padding: '7px 10px',
           boxShadow: '0 8px 40px rgba(0,0,0,0.55)',
-          pointerEvents: 'all',          /* re-enable clicks on the pill */
+          pointerEvents: 'all',
           transition: 'background 0.3s ease',
         }}>
 
@@ -93,7 +93,7 @@ function App() {
                   marginLeft: 3, fontSize: 11, fontWeight: 500,
                 }}>AI</span>
               </div>
-              <div style={{ fontSize: 8, color: '#525252', textTransform: 'uppercase', letterSpacing: '0.10em', fontFamily: 'JetBrains Mono, monospace' }}>
+              <div className="navbar-engine-label" style={{ fontSize: 8, color: '#525252', textTransform: 'uppercase', letterSpacing: '0.10em', fontFamily: 'JetBrains Mono, monospace' }}>
                 Routing Engine v0.1
               </div>
             </div>

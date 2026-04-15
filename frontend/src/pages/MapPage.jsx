@@ -567,7 +567,7 @@ function MapPage({ apiStatus, onGoBack }) {
       }} />
 
       {/* Floating side panel */}
-      <div style={{
+      <div className="hud-left-panel" style={{
         position: 'absolute',
         top: 10,
         left: 10,
@@ -746,7 +746,7 @@ function MapPage({ apiStatus, onGoBack }) {
       </div>
 
       {/* Top-right anomaly controls */}
-      <div style={{
+      <div className="hud-anomaly-controls" style={{
         position: 'absolute',
         top: 14,
         right: 14,
