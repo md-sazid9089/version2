@@ -21,10 +21,9 @@ python-dotenv==1.0.1
 orjson==3.9.15
 scikit-learn==1.5.2
 
-# Database
+# Database (SQLite is built into Python — no driver needed)
+# TODO: Add pymysql==1.1.0 and cryptography==46.0.7 when switching back to MySQL
 SQLAlchemy==2.0.29
-pymysql==1.1.0
-cryptography==46.0.7
 bcrypt==4.1.2
 PyJWT==2.12.1
 

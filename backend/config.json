@@ -102,12 +102,9 @@
   },
 
   "database": {
-    "driver": "mysql+pymysql",
-    "user": "golitransit",
-    "password": "golitransit_pass",
-    "host": "mysql",
-    "port": 3306,
-    "database": "golitransit"
+    "type": "sqlite",
+    "driver": "sqlite",
+    "url": "sqlite:///./golitransit.db"
   },
 
   "jwt": {

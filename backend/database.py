@@ -19,23 +19,25 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from config import settings
 
-# Database URL
-if settings.database_url:
-    DATABASE_URL = settings.database_url
-else:
-    DATABASE_URL = f"{settings.db_driver}://{settings.db_user}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}"
+# Database URL — defaults to local SQLite file; override via DATABASE_URL env var
+DATABASE_URL = settings.database_url or "sqlite:///./golitransit.db"
 
-# SSL Arguments (Required for Azure MySQL)
-connect_args = {}
-if "ssl_disabled=true" not in DATABASE_URL and settings.db_ssl_mode.lower() == "require":
+IS_SQLITE = DATABASE_URL.startswith("sqlite")
+
+# SQLite needs check_same_thread=False for FastAPI; MySQL/Postgres need no extra args here
+connect_args = {"check_same_thread": False} if IS_SQLITE else {}
+
+# SSL for remote MySQL/PostgreSQL (skipped for SQLite)
+if not IS_SQLITE and "ssl_disabled=true" not in DATABASE_URL and settings.db_ssl_mode.lower() == "require":
     connect_args = {"ssl": {"ca": "/etc/ssl/certs/ca-certificates.crt"}}
 
 # Create engine
 engine = create_engine(
     DATABASE_URL,
     echo=False,
-    pool_pre_ping=True,  # Verify connections before using them
-    pool_recycle=3600,   # Recycle connections after 1 hour
+    pool_pre_ping=True,
+    # pool_recycle not supported by SQLite's StaticPool
+    **({} if IS_SQLITE else {"pool_recycle": 3600}),
     connect_args=connect_args,
 )
 
