@@ -9,8 +9,10 @@
     "center_lng": 90.4066,
     "radius_m": 2500,
     "network_type": "all",
-    "simplify": true,
-    "cache_dir": "./data/osm_cache"
+    "simplify": false,
+    "retain_all": true,
+    "cache_dir": "./data/osm_cache",
+    "_note": "simplify=false keeps every OSM GPS node. retain_all=true keeps disconnected subgraphs."
   },
 
   "vehicle_types": {
@@ -22,19 +24,19 @@
     },
     "bike": {
       "default_speed_kmh": 15,
-      "allowed_road_types": ["cycleway", "residential", "tertiary", "tertiary_link", "secondary", "secondary_link", "primary", "primary_link", "trunk", "trunk_link", "unclassified", "service", "living_street", "path", "track", "bridleway", "footway", "pedestrian", "road"],
+      "allowed_road_types": ["cycleway", "path", "track", "bridleway", "footway", "pedestrian", "living_street", "residential", "service", "unclassified", "tertiary", "tertiary_link", "secondary", "secondary_link", "primary", "primary_link", "trunk", "trunk_link", "road", "alley", "lane", "corridor"],
       "fuel_cost_per_km": 0.0,
       "co2_grams_per_km": 0
     },
     "rickshaw": {
-      "default_speed_kmh": 15,
-      "allowed_road_types": ["trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link", "residential", "service", "unclassified", "living_street", "path", "track", "road", "alley"],
+      "default_speed_kmh": 12,
+      "allowed_road_types": ["trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link", "residential", "living_street", "service", "unclassified", "path", "track", "road", "alley", "lane", "footway", "pedestrian"],
       "fuel_cost_per_km": 0.03,
       "co2_grams_per_km": 0
     },
     "walk": {
       "default_speed_kmh": 5,
-      "allowed_road_types": ["footway", "path", "track", "bridleway", "steps", "crossing", "pedestrian", "living_street", "residential", "service", "alley", "road", "unclassified", "tertiary", "tertiary_link", "secondary", "secondary_link", "primary", "primary_link", "trunk", "trunk_link"],
+      "allowed_road_types": ["footway", "path", "track", "bridleway", "steps", "crossing", "pedestrian", "living_street", "residential", "service", "alley", "lane", "road", "corridor", "unclassified", "tertiary", "tertiary_link", "secondary", "secondary_link", "primary", "primary_link", "trunk", "trunk_link", "platform", "construction"],
       "fuel_cost_per_km": 0.0,
       "co2_grams_per_km": 0
     },
