@@ -29,7 +29,12 @@ from config import settings
 # Priority 1: Full DATABASE_URL env var (recommended for Azure deployments)
 # Priority 2: Compose from individual DB_* env vars using ODBC Driver 18
 if settings.database_url:
-    DATABASE_URL = settings.database_url
+    _url = settings.database_url.strip()
+    # Guard against common copy-paste mistake: pasting "DATABASE_URL=mssql+..."
+    # as the value instead of just "mssql+..."
+    if "=" in _url and _url.split("=", 1)[0].strip().upper() == "DATABASE_URL":
+        _url = _url.split("=", 1)[1].strip()
+    DATABASE_URL = _url
 else:
     # Build Azure SQL ODBC connection string from individual settings
     odbc_str = (
