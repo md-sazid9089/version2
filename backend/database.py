@@ -20,7 +20,15 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from config import settings
 
 # Database URL
-DATABASE_URL = f"{settings.db_driver}://{settings.db_user}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}"
+if settings.database_url:
+    DATABASE_URL = settings.database_url
+else:
+    DATABASE_URL = f"{settings.db_driver}://{settings.db_user}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}"
+
+# SSL Arguments (Required for Azure MySQL)
+connect_args = {}
+if "ssl_disabled=true" not in DATABASE_URL and settings.db_ssl_mode.lower() == "require":
+    connect_args = {"ssl": {"ca": "/etc/ssl/certs/ca-certificates.crt"}}
 
 # Create engine
 engine = create_engine(
@@ -28,6 +36,7 @@ engine = create_engine(
     echo=False,
     pool_pre_ping=True,  # Verify connections before using them
     pool_recycle=3600,   # Recycle connections after 1 hour
+    connect_args=connect_args,
 )
 
 # Session factory
