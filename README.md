@@ -1199,7 +1199,7 @@ Aust_hackathon_26/
 - Backend (Azure App Service): https://maploactor-eve5e0d5f5h0aqh8.southeastasia-01.azurewebsites.net/
 - Backend (Render): https://aust-hackathon-26.onrender.com/
 - Public live domain: https://www.smartcommutebd.live/
-- Backend is currently not working in deployment due to free tier limit
+
 Notes:
 
 - The same codebase supports multiple backend hosting targets (Azure and Render) and a Vercel-hosted frontend.

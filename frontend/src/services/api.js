@@ -21,7 +21,7 @@ let lastNetworkErrorLogAt = 0;
 // ─── Base URL ───────────────────────────────────────────────────
 // In dev: Use relative paths, Vite proxy handles routing to backend
 // In prod: May need adjustment for deployed backend URL
-const BASE_URL = '/api';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 // ─── Axios Instance ─────────────────────────────────────────────
 

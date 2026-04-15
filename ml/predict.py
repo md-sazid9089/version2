@@ -72,7 +72,7 @@ config = _load_config()
 ml_config = config.get("ml", {})
 server_config = config.get("server", {})
 
-ML_PORT = server_config.get("ml_server_port", 8001)
+ML_PORT = int(os.environ.get("PORT", server_config.get("ml_server_port", 8001)))
 MODEL_TYPE = ml_config.get("model_type", "random_forest")
 
 
