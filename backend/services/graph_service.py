@@ -11,12 +11,14 @@ import os
 import threading
 import time
 from typing import Optional
+from pathlib import Path
 
 import networkx as nx
 import numpy as np
 
 from config import settings
 from models.graph_models import GraphSnapshot, GraphNode, GraphEdge
+from utils.osm_graph_builder import load_graph_cache_pkl
 
 
 _PROFILE_ENV = "ROUTING_PROFILE"
@@ -249,51 +251,67 @@ class GraphService:
         )
 
         graph: Optional[nx.MultiDiGraph] = None
-
-        try:
+        
+        # ─── Try loading from pickle cache first ─────────────────────
+        use_cache = os.getenv("USE_GRAPH_CACHE", "1").lower() in {"1", "true", "yes"}
+        if use_cache and location == settings.osm_location:
             fetch_started = time.perf_counter()
-            if location != settings.osm_location:
-                graph = ox.graph_from_place(
-                    location,
-                    network_type=settings.network_type,
-                    simplify=settings.simplify_graph,
-                )
-            else:
-                # Default runtime path: local neighborhood graph around AUST.
-                graph = ox.graph_from_point(
-                    center_point=(self._center_lat, self._center_lng),
-                    dist=self._radius_m,
-                    dist_type="bbox",
-                    network_type=settings.network_type,
-                    simplify=settings.simplify_graph,
-                )
+            cache_dir = Path(settings.graph_cache_dir or "./data/osm_cache")
+            safe_location = location.replace(", ", "_").lower().replace(" ", "_")
+            cache_file = cache_dir / f"{safe_location}_graph.pkl"
+            
+            cached_graph = load_graph_cache_pkl(str(cache_file))
+            if cached_graph is not None:
+                graph = cached_graph
+                fetch_ms = (time.perf_counter() - fetch_started) * 1000.0
+                print(f"[GraphService] ✓ Loaded from cache in {fetch_ms:.1f}ms")
+        
+        # ─── Fall back to OSM download if no cache ────────────────────
+        if graph is None:
+            try:
+                fetch_started = time.perf_counter()
+                if location != settings.osm_location:
+                    graph = ox.graph_from_place(
+                        location,
+                        network_type=settings.network_type,
+                        simplify=settings.simplify_graph,
+                    )
+                else:
+                    # Default runtime path: local neighborhood graph around AUST.
+                    graph = ox.graph_from_point(
+                        center_point=(self._center_lat, self._center_lng),
+                        dist=self._radius_m,
+                        dist_type="bbox",
+                        network_type=settings.network_type,
+                        simplify=settings.simplify_graph,
+                    )
 
-                # Enforce strict circular radius (not just bounding box).
-                nodes_outside = []
-                for node_id, node_data in graph.nodes(data=True):
-                    y = float(node_data.get("y") or 0.0)
-                    x = float(node_data.get("x") or 0.0)
-                    if (
-                        _haversine_m(self._center_lat, self._center_lng, y, x)
-                        > self._radius_m
-                    ):
-                        nodes_outside.append(node_id)
+                    # Enforce strict circular radius (not just bounding box).
+                    nodes_outside = []
+                    for node_id, node_data in graph.nodes(data=True):
+                        y = float(node_data.get("y") or 0.0)
+                        x = float(node_data.get("x") or 0.0)
+                        if (
+                            _haversine_m(self._center_lat, self._center_lng, y, x)
+                            > self._radius_m
+                        ):
+                            nodes_outside.append(node_id)
 
-                if nodes_outside:
-                    graph.remove_nodes_from(nodes_outside)
+                    if nodes_outside:
+                        graph.remove_nodes_from(nodes_outside)
 
-            fetch_ms = (time.perf_counter() - fetch_started) * 1000.0
+                fetch_ms = (time.perf_counter() - fetch_started) * 1000.0
 
-            # Keep only the largest connected component to avoid tiny disconnected scraps.
-            trim_started = time.perf_counter()
-            if graph.number_of_nodes() > 0:
-                largest_cc = max(nx.weakly_connected_components(graph), key=len)
-                graph = graph.subgraph(largest_cc).copy()
-            trim_ms = (time.perf_counter() - trim_started) * 1000.0
-        except Exception as e:
-            raise RuntimeError(
-                f"Failed to load OSM graph around AUST center ({self._center_lat}, {self._center_lng})"
-            ) from e
+                # Keep only the largest connected component to avoid tiny disconnected scraps.
+                trim_started = time.perf_counter()
+                if graph.number_of_nodes() > 0:
+                    largest_cc = max(nx.weakly_connected_components(graph), key=len)
+                    graph = graph.subgraph(largest_cc).copy()
+                trim_ms = (time.perf_counter() - trim_started) * 1000.0
+            except Exception as e:
+                raise RuntimeError(
+                    f"Failed to load OSM graph around AUST center ({self._center_lat}, {self._center_lng})"
+                ) from e
 
         if graph is None:
             raise RuntimeError("Graph load failed: no graph returned")

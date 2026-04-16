@@ -38,5 +38,9 @@ Thumbs.db
 .env.local
 *.log
 
-# OSM cache
-data/osm_cache/
+# OSM cache (build intermediates, but commit the final graph)
+data/osm_cache/*_meta.json
+data/osm_cache/*.tmp
+data/osm_cache/*.temp
+# Note: *_graph.pkl files should be committed for faster startup
+

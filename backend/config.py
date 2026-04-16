@@ -100,6 +100,7 @@ class Settings:
     graph_center_lat: float = float(os.getenv("GRAPH_CENTER_LAT", _raw.get("graph", {}).get("center_lat", 23.7639)))
     graph_center_lng: float = float(os.getenv("GRAPH_CENTER_LNG", _raw.get("graph", {}).get("center_lng", 90.4066)))
     graph_radius_m: float = float(os.getenv("GRAPH_RADIUS_M", _raw.get("graph", {}).get("radius_m", 2000)))
+    graph_cache_dir: Optional[str] = os.getenv("GRAPH_CACHE_DIR", _raw.get("graph", {}).get("cache_dir", "./data/osm_cache"))
 
     # Vehicle types (dict of dicts)
     vehicle_types: dict[str, Any] = field(default_factory=lambda: _raw.get("vehicle_types", {}))

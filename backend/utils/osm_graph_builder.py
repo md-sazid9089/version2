@@ -27,10 +27,14 @@ Usage:
 
 import os
 import json
+import pickle
+import hashlib
+import time
 from pathlib import Path
 from typing import Optional, Dict, Any, Tuple
 import logging
 import threading
+from datetime import datetime
 
 import networkx as nx
 import osmnx as ox
@@ -285,6 +289,110 @@ def _load_graph_cache(cache_path: str) -> Optional[nx.MultiDiGraph]:
             logger.warning(f"Failed to load cache: {e}")
     
     return None
+
+
+def save_graph_cache_pkl(
+    graph: nx.MultiDiGraph,
+    location: str = "Dhaka, Bangladesh",
+    output_dir: str = "./data/osm_cache"
+) -> str:
+    """
+    Save graph to pickle file with metadata.
+    
+    Pickle format is much faster than GraphML for large graphs and
+    preserves all complex Python object attributes.
+    
+    Args:
+        graph: NetworkX MultiDiGraph to serialize
+        location: Location name (used for filename)
+        output_dir: Directory to save pickle file
+    
+    Returns:
+        Path to saved pickle file
+    """
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    # Generate filename from location
+    safe_name = location.replace(", ", "_").lower().replace(" ", "_")
+    cache_file = output_path / f"{safe_name}_graph.pkl"
+    
+    metadata_file = output_path / f"{safe_name}_graph_meta.json"
+    
+    try:
+        logger.info(f"Saving graph to pickle: {cache_file}")
+        
+        # Save the graph as pickle
+        with open(cache_file, 'wb') as f:
+            pickle.dump(graph, f, protocol=pickle.HIGHEST_PROTOCOL)
+        
+        # Create metadata file
+        metadata = {
+            "location": location,
+            "timestamp": datetime.now().isoformat(),
+            "nodes": graph.number_of_nodes(),
+            "edges": graph.number_of_edges(),
+            "pickle_file": cache_file.name,
+            "file_size_bytes": cache_file.stat().st_size,
+            "file_size_mb": round(cache_file.stat().st_size / (1024 * 1024), 2),
+        }
+        
+        # Calculate simple hash of graph structure for verification
+        edge_count_str = f"{graph.number_of_nodes()}_{graph.number_of_edges()}"
+        metadata["structure_hash"] = hashlib.md5(edge_count_str.encode()).hexdigest()[:12]
+        
+        with open(metadata_file, 'w') as f:
+            json.dump(metadata, f, indent=2)
+        
+        logger.info(
+            f"Graph saved: {cache_file.name} "
+            f"({metadata['file_size_mb']} MB, "
+            f"{graph.number_of_nodes()} nodes, "
+            f"{graph.number_of_edges()} edges)"
+        )
+        
+        return str(cache_file)
+        
+    except Exception as e:
+        logger.error(f"Failed to save graph cache: {e}")
+        raise
+
+
+def load_graph_cache_pkl(cache_file: str) -> Optional[nx.MultiDiGraph]:
+    """
+    Load graph from pickle file.
+    
+    Args:
+        cache_file: Path to pickle file
+    
+    Returns:
+        NetworkX graph if found and valid, None otherwise
+    """
+    cache_path = Path(cache_file)
+    
+    if not cache_path.exists():
+        logger.debug(f"Cache file not found: {cache_file}")
+        return None
+    
+    try:
+        logger.info(f"Loading graph from pickle: {cache_file}")
+        load_start = time.time()
+        
+        with open(cache_path, 'rb') as f:
+            graph = pickle.load(f)
+        
+        load_time = time.time() - load_start
+        logger.info(
+            f"Graph loaded in {load_time:.2f}s: "
+            f"{graph.number_of_nodes()} nodes, "
+            f"{graph.number_of_edges()} edges"
+        )
+        
+        return graph
+        
+    except Exception as e:
+        logger.error(f"Failed to load graph cache: {e}")
+        return None
 
 
 def _create_synthetic_dhaka_graph() -> nx.MultiDiGraph:

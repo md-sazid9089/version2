@@ -11,7 +11,9 @@ All business logic lives in the `services/` layer — routes are thin
 wrappers that validate input, delegate to services, and return responses.
 """
 
+import os
 from contextlib import asynccontextmanager
+import time
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,6 +25,7 @@ from routes import health, auth, route, anomaly, graph, traffic
 from routes.v2 import router as v2_router
 from services.ml_integration import ml_integration
 from services.traffic_jam_service import traffic_jam_service
+from services.graph_service import graph_service
 
 
 # ─── Lifespan: load the road graph once at startup ───────────────
@@ -31,14 +34,36 @@ async def lifespan(app: FastAPI):
     """
     On startup:
       - Create database tables if they don't exist
-      - Skip graph/model preloading to keep boot memory low
+      - Preload graph from cache (fast) or OSM (slow first time)
     On shutdown: clean up resources.
     """
     print("[startup] Creating database tables...")
     Base.metadata.create_all(bind=engine)
     print("[startup] Database tables created/verified")
 
-    print("[startup] Lazy runtime enabled - graph and traffic model load on demand")
+    # ─── Preload graph on startup ────────────────────────
+    preload_graph = os.getenv("PRELOAD_GRAPH", "1").lower() in {"1", "true", "yes"}
+    use_cache = os.getenv("USE_GRAPH_CACHE", "1").lower() in {"1", "true", "yes"}
+    
+    if preload_graph:
+        try:
+            print(f"[startup] Preloading graph (cache={'enabled' if use_cache else 'disabled'})...")
+            load_start = time.time()
+            graph_service.ensure_loaded()
+            load_time = time.time() - load_start
+            
+            if graph_service._graph:
+                print(
+                    f"[startup] ✓ Graph loaded in {load_time:.2f}s "
+                    f"({graph_service._graph.number_of_nodes()} nodes, "
+                    f"{graph_service._graph.number_of_edges()} edges)"
+                )
+            else:
+                print(f"[startup] ⚠ Graph preload failed, will load on first request")
+        except Exception as e:
+            print(f"[startup] ⚠ Graph preload error: {e}")
+    else:
+        print("[startup] Graph preload disabled - will load on demand")
 
     yield
     print("[shutdown] Cleaning up resources...")
